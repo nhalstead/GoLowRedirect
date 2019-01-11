@@ -13,7 +13,9 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -24,14 +26,15 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// Config: The Config file that Gets Loaded on Start
+// Config - The Config file that Gets Loaded on Start
 type Config struct {
 	FinalRedirect string    `json:"defaultRedirect"`
 	RedirectRules []URLRule `json:"redirects"`
 }
 
-// URLRule: Control Redirects in the Config File
+// URLRule - Controls Redirects in the Config File
 type URLRule struct {
+	Type            string   `json:"type"`
 	Path            string   `json:"rule"`
 	URL             string   `json:"url"`
 	RedirectOptions struct{} `json:"options"`
@@ -39,10 +42,13 @@ type URLRule struct {
 
 func main() {
 	var wait time.Duration
-	flag.DurationVar(&wait, "graceful-timeout", time.Second*15, "the duration for which the server gracefully wait for existing connections to finish - e.g. 15s or 1m")
+	flag.DurationVar(&wait, "gtimeout", time.Second*15, "The duration for which the server gracefully wait for existing connections to finish - e.g. 15s or 1m")
 	flag.Parse()
 
-	conf := Config{FinalRedirect: "https://example.com", RedirectRules: []URLRule{URLRule{Path: "/go", URL: "https://golang.org"}, URLRule{Path: "/nh", URL: "https://nhalstead.me"}}}
+	conf := Config{}
+
+	fileData, _ := ioutil.ReadFile("./config.json")
+	json.Unmarshal(fileData, &conf)
 
 	r := mux.NewRouter()
 

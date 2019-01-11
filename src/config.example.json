@@ -1,0 +1,13 @@
+{
+  "defaultRedirect": "http://example.com",
+  "redirects": [
+      {
+        "rule": "/google",
+        "url": "https://google.com"
+      },
+      {
+        "rule": "/drive",
+        "url": "https://drive.google.com"
+      }
+  ]
+}
